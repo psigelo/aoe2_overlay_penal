@@ -10,7 +10,7 @@ euyVJTMxa6WVNQlVb9ndNel7VNHXlXwYZ1SbIU67IjkbRUledKmZVWs9bt3YBTllc2iQIasUI8kHxopd
 
 Luego la ejecución va a fallar pues es necesario configurar el profile como se explica a continuación:
 
-Crear un archivo profile.txt (o un archivo de texto con nombre profile) e introducir el numero de serie de tu cuenta, sigue los siguientes pasos:
+Crear un archivo profile.txt en la misma carpeta donde esté el ejecutable (o un archivo de texto con nombre profile) e introducir el numero de serie de tu cuenta, sigue los siguientes pasos:
 
 Ir a https://aoe2-overlay.neyl.dev/
 Buscar tu usuario

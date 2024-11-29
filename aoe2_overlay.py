@@ -21,6 +21,11 @@ def get_player_ratings(id_profile):
         if lb["leaderboardId"] == 'rm_team':
             result["rm_team"] = lb["rating"]
 
+    if result.get("rm_1v1") is None:
+        result["rm_1v1"] = ""
+    if result.get("rm_team") is None:
+        result["rm_team"] = ""
+
     return result
 
 
@@ -59,7 +64,9 @@ def get_overlay_data(id_profile):
                     "profile": -1,
                     "name": "IA",
                     "elo_tg": 0,
-                    "elo_1v1": 0
+                    "elo_1v1": 0,
+                    "country": " ",
+                    "civ": " ",
                 }
                 all_players.append(player_it)
     leaderboardName = match_data["matches"][0]['leaderboardName']
@@ -129,7 +136,7 @@ def create_overlay(id_profile):
 
             players, _, match_title = overlay_data
             window["-TITLE-"].update(match_title)
-            table_data = [[player["name"], player["elo_tg"],player["elo_1v1"], player["country"], player["civ"]] for player in players]
+            table_data = [[player["name"], player["elo_tg"], player["elo_1v1"], player["country"], player["civ"]] for player in players]
             window["-TABLE-"].update(values=table_data)
             window["-TITLE-"].update(match_title)
 
