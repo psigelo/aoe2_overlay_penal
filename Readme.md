@@ -1,5 +1,7 @@
 ## Instalación
 
+Descargar el ejecutable desde https://github.com/psigelo/aoe2_overlay_penal/releases/tag/AoeOverlay1.0
+
 Al momento de la primera ejecución se va a exigir aceptar la licencia de PySimpleGUI, una vez aceptada la licencia introducir la siguiente llave de desarrollo:
 
 
