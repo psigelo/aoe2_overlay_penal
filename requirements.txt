@@ -1,3 +1,4 @@
 PySimpleGUI
 requests
 bs4
+numpy

@@ -5,9 +5,21 @@ import json
 import PySimpleGUI as sg
 import traceback
 import time
+import numpy as np
 
 last_match_id = None
 
+def puntaje_en_juego(p_1, p_2):
+    diff_elo = p_1 - p_2
+
+    elo_f = lambda x: 32 * (0.5 - (1 / (1 + 10 ** (-abs(x / 400)))))
+    sing_elo_p1 = -1 if p_1 < p_2 else 1
+    sing_elo_p2 = -1 if p_2 < p_1 else 1
+
+    p1_wins = round(16 + sing_elo_p1 * elo_f(diff_elo))
+    p1_loose = round(32 - p1_wins)
+
+    return p1_wins, p1_loose
 
 def get_player_ratings(id_profile):
     result = {}
@@ -56,6 +68,7 @@ def get_overlay_data(id_profile):
                     "elo_1v1": player_ratings["rm_1v1"],
                     "country": player["country"],
                     "civ": player["civ"],
+                    "rating": player['rating']
                 }
                 all_players.append(player_it)
             except:
@@ -67,8 +80,39 @@ def get_overlay_data(id_profile):
                     "elo_1v1": 0,
                     "country": " ",
                     "civ": " ",
+                    "rating": 0
                 }
                 all_players.append(player_it)
+
+    players_by_team = {}
+    ratings_by_team = {}
+    for player in all_players:
+        if players_by_team.get(player["team"]) is None:
+            players_by_team[player["team"]] = [player]
+            ratings_by_team[player["team"]] = [player["rating"]]
+        else:
+            players_by_team[player["team"]].append(player)
+            ratings_by_team[player["team"]].append(player["rating"])
+
+    teams = list(players_by_team.keys())
+
+    for player in players_by_team[teams[0]]:
+        w, l = puntaje_en_juego(player["rating"], np.array(ratings_by_team[teams[1]]).mean())
+        for player_it2 in all_players:
+            if player_it2["name"] == player["name"]:
+                player_it2["win"] = w
+                player_it2["loose"] = l
+
+    for player in players_by_team[teams[1]]:
+        w, l = puntaje_en_juego(player["rating"], np.array(ratings_by_team[teams[0]]).mean())
+        for player_it2 in all_players:
+            if player_it2["name"] == player["name"]:
+                player_it2["win"] = w
+                player_it2["loose"] = l
+
+
+
+
     leaderboardName = match_data["matches"][0]['leaderboardName']
     return all_players, leaderboardName, match_title
 
@@ -78,13 +122,13 @@ def create_overlay(id_profile):
     overlay_data = get_overlay_data(id_profile)
     players, _, match_title = overlay_data
     # Table headers
-    headers = ["Name", "TG", "RM 1v1", "Country", "Civ"]
+    headers = ["Name", "TG", "RM 1v1", "Country", "Civ", "Win", "Loose"]
 
     # Layout for the window
     layout = [
         [sg.Text(match_title, justification='center', font=("Arial", 16), size=(50, 1), text_color="white", background_color="#333333", key="-TITLE-")],
         [sg.Table(
-            values=[[player["name"], player["elo_tg"],player["elo_1v1"], player["country"], player["civ"]] for player in players],
+            values=[[player["name"], player["elo_tg"],player["elo_1v1"], player["country"], player["civ"], player["win"], player["loose"]] for player in players],
             headings=headers,
             auto_size_columns=True,
             justification="center",
@@ -136,7 +180,7 @@ def create_overlay(id_profile):
 
             players, _, match_title = overlay_data
             window["-TITLE-"].update(match_title)
-            table_data = [[player["name"], player["elo_tg"], player["elo_1v1"], player["country"], player["civ"]] for player in players]
+            table_data = [[player["name"], player["elo_tg"], player["elo_1v1"], player["country"], player["civ"], player["win"], player["loose"]] for player in players]
             window["-TABLE-"].update(values=table_data)
             window["-TITLE-"].update(match_title)
 
