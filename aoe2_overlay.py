@@ -14,7 +14,6 @@ def puntaje_en_juego(p_1, p_2):
 
     elo_f = lambda x: 32 * (0.5 - (1 / (1 + 10 ** (-abs(x / 400)))))
     sing_elo_p1 = -1 if p_1 < p_2 else 1
-    sing_elo_p2 = -1 if p_2 < p_1 else 1
 
     p1_wins = round(16 + sing_elo_p1 * elo_f(diff_elo))
     p1_loose = round(32 - p1_wins)
@@ -97,14 +96,22 @@ def get_overlay_data(id_profile):
     teams = list(players_by_team.keys())
 
     for player in players_by_team[teams[0]]:
-        w, l = puntaje_en_juego(player["rating"], np.array(ratings_by_team[teams[1]]).mean())
+        if None in [player["rating"]] + ratings_by_team[teams[1]]:
+            w, l = "", ""
+        else:
+            w, l = puntaje_en_juego(player["rating"], np.array(ratings_by_team[teams[1]]).mean())
+
         for player_it2 in all_players:
             if player_it2["name"] == player["name"]:
                 player_it2["win"] = w
                 player_it2["loose"] = l
 
     for player in players_by_team[teams[1]]:
-        w, l = puntaje_en_juego(player["rating"], np.array(ratings_by_team[teams[0]]).mean())
+        if None in [player["rating"]] + ratings_by_team[teams[1]]:
+            w, l = "", ""
+        else:
+            w, l = puntaje_en_juego(player["rating"], np.array(ratings_by_team[teams[0]]).mean())
+
         for player_it2 in all_players:
             if player_it2["name"] == player["name"]:
                 player_it2["win"] = w
