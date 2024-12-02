@@ -47,10 +47,14 @@ def get_overlay_data(id_profile):
     response = requests.get(url_current_match)
     match_data = json.loads(response.content)
 
-    if last_match_id == match_data["matches"][0]['matchId']:
+    try:
+        if last_match_id == match_data["matches"][0]['matchId']:
+            return None
+        else:
+            last_match_id = match_data["matches"][0]['matchId']
+    except:
         return None
-    else:
-        last_match_id = match_data["matches"][0]['matchId']
+
 
     match_title = f"{match_data["matches"][0]['leaderboardName']} on {match_data["matches"][0]['mapName']}"
 
