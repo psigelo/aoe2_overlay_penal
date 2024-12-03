@@ -1,6 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
-import requests
 import json
 import PySimpleGUI as sg
 import traceback
@@ -11,14 +9,13 @@ last_match_id = None
 
 def puntaje_en_juego(p_1, p_2):
     diff_elo = p_1 - p_2
-
     elo_f = lambda x: 32 * (0.5 - (1 / (1 + 10 ** (-abs(x / 400)))))
     sing_elo_p1 = -1 if p_1 < p_2 else 1
-
     p1_wins = round(16 + sing_elo_p1 * elo_f(diff_elo))
     p1_loose = round(32 - p1_wins)
 
     return p1_wins, p1_loose
+
 
 def get_player_ratings(id_profile):
     result = {}
@@ -54,7 +51,6 @@ def get_overlay_data(id_profile):
             last_match_id = match_data["matches"][0]['matchId']
     except:
         return None
-
 
     match_title = f"{match_data["matches"][0]['leaderboardName']} on {match_data["matches"][0]['mapName']}"
 
@@ -121,11 +117,8 @@ def get_overlay_data(id_profile):
                 player_it2["win"] = w
                 player_it2["loose"] = l
 
-
-
-
-    leaderboardName = match_data["matches"][0]['leaderboardName']
-    return all_players, leaderboardName, match_title
+    leaderboard_name = match_data["matches"][0]['leaderboardName']
+    return all_players, leaderboard_name, match_title
 
 
 def create_overlay(id_profile):
@@ -137,9 +130,11 @@ def create_overlay(id_profile):
 
     # Layout for the window
     layout = [
-        [sg.Text(match_title, justification='center', font=("Arial", 16), size=(50, 1), text_color="white", background_color="#333333", key="-TITLE-")],
+        [sg.Text(match_title, justification='center', font=("Arial", 16), size=(50, 1), text_color="white",
+                 background_color="#333333", key="-TITLE-")],
         [sg.Table(
-            values=[[player["name"], player["elo_tg"],player["elo_1v1"], player["country"], player["civ"], player["win"], player["loose"]] for player in players],
+            values=[[player["name"], player["elo_tg"],player["elo_1v1"], player["country"], player["civ"],
+                     player["win"], player["loose"]] for player in players],
             headings=headers,
             auto_size_columns=True,
             justification="center",
@@ -191,7 +186,8 @@ def create_overlay(id_profile):
 
             players, _, match_title = overlay_data
             window["-TITLE-"].update(match_title)
-            table_data = [[player["name"], player["elo_tg"], player["elo_1v1"], player["country"], player["civ"], player["win"], player["loose"]] for player in players]
+            table_data = [[player["name"], player["elo_tg"], player["elo_1v1"], player["country"], player["civ"],
+                           player["win"], player["loose"]] for player in players]
             window["-TABLE-"].update(values=table_data)
             window["-TITLE-"].update(match_title)
 
@@ -203,10 +199,8 @@ if __name__ == "__main__":
     with open('profile.txt', 'r') as archivo:
         for linea in archivo:
             id_profile = linea.strip()
-    # print(id_profile)
     try:
         create_overlay(id_profile)
     except Exception as e:
         with open("error.log", "w") as f:
             f.write(traceback.format_exc())
-
