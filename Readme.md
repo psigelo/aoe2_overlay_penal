@@ -1,6 +1,6 @@
 ## Installation
 
-Download the executable from [this link](https://github.com/psigelo/aoe2_overlay_penal/releases/tag/AoeOverlay1.0).
+Download the executable from [this link](https://github.com/psigelo/aoe2_overlay_penal/releases/tag/tkinter).
 
 Create a file named `profile.txt` in the same folder as the executable (or a text file named `profile`) and enter your account's serial number by following these steps:
 
