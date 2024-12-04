@@ -10,3 +10,4 @@ Create a file named `profile.txt` in the same folder as the executable (or a tex
 
 You can find your profile ID in the navigation bar (it’s a number, without any text).
 
+You can check the roadmap [here](https://github.com/users/psigelo/projects/2/views/1).
