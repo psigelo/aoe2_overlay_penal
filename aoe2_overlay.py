@@ -50,13 +50,13 @@ def get_overlay_data(id_profile):
     response = requests.get(url_current_match)
     match_data = json.loads(response.content)
 
-    try:
-        if last_match_id == match_data["matches"][0]['matchId']:
-            return None
-        else:
-            last_match_id = match_data["matches"][0]['matchId']
-    except:
-        return None
+    # try:
+    #     if last_match_id == match_data["matches"][0]['matchId']:
+    #         return None
+    #     else:
+    #         last_match_id = match_data["matches"][0]['matchId']
+    # except:
+    #     return None
 
     match_title = f"{match_data["matches"][0]['leaderboardName']} on {match_data["matches"][0]['mapName']}"
 
@@ -168,6 +168,19 @@ def create_overlay(player_data, title, id_profile):
                 label.destroy()
         row_labels.clear()
 
+        headers = ["Name", "TG", "RM 1v1", "W/L"]
+        header_labels = []
+        for col, header in enumerate(headers):
+            label = ttk.Label(
+                content_frame,
+                text=header,
+                font=("Arial", 12, "bold"),
+                background=bg_color,
+                foreground=text_color,
+            )
+            label.grid(row=1, column=col, padx=10, pady=10)
+            header_labels.append(label)
+
         overlay_data = get_overlay_data(id_profile)
         if overlay_data is not None:
             players, _, match_title = overlay_data
@@ -275,7 +288,6 @@ def create_overlay(player_data, title, id_profile):
 
     root.bind("<Button-3>", show_context_menu)
     root.mainloop()
-
 
 
 if __name__ == "__main__":
