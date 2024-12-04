@@ -1,16 +1,12 @@
-## Instalación
+## Installation
 
-Descargar el ejecutable desde https://github.com/psigelo/aoe2_overlay_penal/releases/tag/AoeOverlay1.0
+Download the executable from [this link](https://github.com/psigelo/aoe2_overlay_penal/releases/tag/AoeOverlay1.0).
 
-Crear un archivo profile.txt en la misma carpeta donde esté el ejecutable (o un archivo de texto con nombre profile) e introducir el numero de serie de tu cuenta, sigue los siguientes pasos:
+Create a file named `profile.txt` in the same folder as the executable (or a text file named `profile`) and enter your account's serial number by following these steps:
 
-Ir a https://aoe2-overlay.neyl.dev/
-Buscar tu usuario
-Copia tu profile id y pegalo en el archivo profile.txt 
+1. Go to [https://aoe2-overlay.neyl.dev/](https://aoe2-overlay.neyl.dev/).
+2. Search for your username.
+3. Copy your profile ID and paste it into the `profile.txt` file.
 
-
-Tu profile id lo puedes encontrar en la barra de navegación (es un número, sin texto):
-
-
-
+You can find your profile ID in the navigation bar (it’s a number, without any text).
 
