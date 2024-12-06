@@ -1,4 +1,4 @@
-PySimpleGUI
+tkinter
 requests
 bs4
 numpy

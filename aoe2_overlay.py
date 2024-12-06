@@ -4,9 +4,13 @@ import numpy as np
 import tkinter as tk
 from tkinter import ttk
 import traceback
-import random
-import string
+import threading
+import time
+import queue
 
+# Queue to hold shared data
+data_queue = queue.Queue(maxsize=5)
+TERMINATE_QUEUE = False
 last_match_id = None
 id_profile = ""
 with open('profile.txt', 'r') as archivo:
@@ -50,13 +54,13 @@ def get_overlay_data(id_profile):
     response = requests.get(url_current_match)
     match_data = json.loads(response.content)
 
-    # try:
-    #     if last_match_id == match_data["matches"][0]['matchId']:
-    #         return None
-    #     else:
-    #         last_match_id = match_data["matches"][0]['matchId']
-    # except:
-    #     return None
+    try:
+         if last_match_id == match_data["matches"][0]['matchId']:
+             return None
+         else:
+             last_match_id = match_data["matches"][0]['matchId']
+    except:
+        return None
 
     match_title = f"{match_data["matches"][0]['leaderboardName']} on {match_data["matches"][0]['mapName']}"
 
@@ -128,6 +132,17 @@ def get_overlay_data(id_profile):
     leaderboard_name = match_data["matches"][0]['leaderboardName']
     return all_players, leaderboard_name, match_title
 
+
+def get_overlay_data_process(id_profile, delta_t=30):
+    global TERMINATE_QUEUE
+    while not TERMINATE_QUEUE:
+        overlay_data = get_overlay_data(id_profile)
+        if not (overlay_data is None):
+            data_queue.put(overlay_data)
+        time.sleep(delta_t)
+
+
+
 # Create the overlay
 def create_overlay(player_data, title, id_profile):
     # Create the main window
@@ -163,49 +178,51 @@ def create_overlay(player_data, title, id_profile):
     def update_overlay():
         nonlocal id_profile
         nonlocal row_labels
-        for row in row_labels:
-            for label in row:
-                label.destroy()
-        row_labels.clear()
+        if not data_queue.empty():
 
-        headers = ["Name", "TG", "RM 1v1", "W/L"]
-        header_labels = []
-        for col, header in enumerate(headers):
-            label = ttk.Label(
-                content_frame,
-                text=header,
-                font=("Arial", 12, "bold"),
-                background=bg_color,
-                foreground=text_color,
-            )
-            label.grid(row=1, column=col, padx=10, pady=10)
-            header_labels.append(label)
+            for row in row_labels:
+                for label in row:
+                    label.destroy()
+            row_labels.clear()
 
-        overlay_data = get_overlay_data(id_profile)
-        if overlay_data is not None:
-            players, _, match_title = overlay_data
+            headers = ["Name", "TG", "RM 1v1", "W/L"]
+            header_labels = []
+            for col, header in enumerate(headers):
+                label = ttk.Label(
+                    content_frame,
+                    text=header,
+                    font=("Arial", 12, "bold"),
+                    background=bg_color,
+                    foreground=text_color,
+                )
+                label.grid(row=1, column=col, padx=10, pady=10)
+                header_labels.append(label)
 
-            for row, player in enumerate(players, start=2):
-                row_data = []
-                for col, header in enumerate(headers):
-                    value = player.get(header, "")
-                    label = ttk.Label(
-                        content_frame,
-                        text=str(value),
-                        font=("Arial", 10),
-                        background=bg_color,
-                        foreground=text_color,
-                    )
-                    label.grid(row=row, column=col, padx=10, pady=5)
-                    row_data.append(label)
-                row_labels.append(row_data)
+            overlay_data = data_queue.get()
 
-            # Update the title
-            title_var.set(match_title)
+            if overlay_data is not None:
+                players, _, match_title = overlay_data
 
-        root.after(60000, update_overlay)  # Refresh every 10 seconds
+                for row, player in enumerate(players, start=2):
+                    row_data = []
+                    for col, header in enumerate(headers):
+                        value = player.get(header, "")
+                        label = ttk.Label(
+                            content_frame,
+                            text=str(value),
+                            font=("Arial", 10),
+                            background=bg_color,
+                            foreground=text_color,
+                        )
+                        label.grid(row=row, column=col, padx=10, pady=5)
+                        row_data.append(label)
+                    row_labels.append(row_data)
 
-    # Call `update_overlay` to initialize the table
+                # Update the title
+                title_var.set(match_title)
+
+        root.after(1000, update_overlay)  # Refresh every 10 seconds
+
     update_overlay()
 
     # Minimize functionality
@@ -294,7 +311,11 @@ if __name__ == "__main__":
     try:
         # Start the overlay
         # player_data, _, title = get_overlay_data(id_profile)
+        producer_thread = threading.Thread(target=get_overlay_data_process, args=(id_profile,))
+        producer_thread.start()
         create_overlay(None, "LOADING", id_profile)
+        TERMINATE_QUEUE = True
+        producer_thread.join()
     except Exception as e:
         with open("error.log", "w") as f:
             f.write(traceback.format_exc())
